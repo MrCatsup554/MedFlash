@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedFlash – Instrumentos Quirúrgicos</title>
+    <meta name="description"
+        content="Plataforma interactiva de flashcards para el estudio de instrumentos médicos y quirúrgicos. Modo quiz y modo práctica." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="site-header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">🔬</span>
+                <span class="logo-text">Med<span class="logo-accent">Flash</span></span>
+            </div>
+            <nav class="mode-switcher">
+                <button id="btn-quiz-mode" class="mode-btn active" onclick="switchMode('quiz')">
+                    <span class="mode-icon">⚡</span> Modo Quiz
+                </button>
+                <button id="btn-practice-mode" class="mode-btn" onclick="switchMode('practice')">
+                    <span class="mode-icon">📖</span> Modo Práctica
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTAINER ===== -->
+    <main id="app-container">
+
+        <!-- ============================
+         QUIZ MODE
+    ============================= -->
+        <section id="quiz-section" class="app-section active">
+
+            <!-- Stats bar -->
+            <div class="stats-bar">
+                <div class="stat-pill" id="stat-progress">
+                    <span class="stat-icon">📍</span>
+                    <span id="progress-text">0 / 0</span>
+                </div>
+                <div class="stat-pill correct">
+                    <span class="stat-icon">✅</span>
+                    <span id="correct-count">0</span>
+                </div>
+                <div class="stat-pill wrong">
+                    <span class="stat-icon">❌</span>
+                    <span id="wrong-count">0</span>
+                </div>
+                <button id="btn-restart" class="btn-reset" onclick="restartQuiz()" title="Reiniciar circuito">
+                    🔄 Reiniciar
+                </button>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <!-- Flashcard -->
+            <div class="flashcard-wrapper" id="quiz-card-wrapper">
+                <div class="flashcard" id="quiz-card">
+                    <!-- Image side -->
+                    <div class="card-image-area">
+                        <img id="quiz-img" src="" alt="Instrumento médico" />
+                        <div class="card-category-badge" id="quiz-category"></div>
+                    </div>
+                    <!-- Question -->
+                    <p class="card-question">¿Qué instrumento es este?</p>
+                    <!-- Options -->
+                    <div class="options-grid" id="options-container">
+                        <!-- dynamically filled -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info panel (shown after answering) -->
+            <div class="info-panel hidden" id="info-panel">
+                <div class="info-panel-inner">
+                    <h2 class="info-name" id="info-name"></h2>
+                    <div class="info-grid">
+                        <div class="info-row" id="info-otros" style="display:none">
+                            <span class="info-label">Otros nombres</span>
+                            <span class="info-value" id="info-otros-val"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Categoría</span>
+                            <span class="info-value" id="info-categoria"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Descripción</span>
+                            <span class="info-value" id="info-descripcion"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Uso(s)</span>
+                            <span class="info-value" id="info-usos"></span>
+                        </div>
+                        <div class="info-row" id="info-mas-row" style="display:none">
+                            <span class="info-label">Más información</span>
+                            <span class="info-value" id="info-mas"></span>
+                        </div>
+                    </div>
+                    <button class="btn-next" id="btn-next" onclick="nextCard()">
+                        Siguiente →
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================
+         PRACTICE MODE
+    ============================= -->
+        <section id="practice-section" class="app-section">
+
+            <div class="practice-header">
+                <h2 class="practice-title">📖 Modo Práctica</h2>
+                <p class="practice-subtitle">Navega por todos los instrumentos y revela la información cuando quieras.
+                </p>
+                <div class="practice-controls">
+                    <button class="btn-prev-card" onclick="practiceNav(-1)">← Anterior</button>
+                    <span id="practice-counter" class="practice-counter">1 / 86</span>
+                    <button class="btn-next-card" onclick="practiceNav(1)">Siguiente →</button>
+                </div>
+            </div>
+
+            <div class="flashcard-wrapper">
+                <div class="flashcard practice-card" id="practice-card">
+                    <div class="card-image-area">
+                        <img id="practice-img" src="" alt="Instrumento médico" />
+                        <div class="card-category-badge" id="practice-category"></div>
+                    </div>
+
+                    <button class="btn-reveal" id="btn-reveal" onclick="togglePracticeInfo()">
+                        👁 Mostrar información
+                    </button>
+
+                    <div class="info-panel practice-info hidden" id="practice-info-panel">
+                        <div class="info-panel-inner">
+                            <h2 class="info-name" id="practice-info-name"></h2>
+                            <div class="info-grid">
+                                <div class="info-row" id="pr-otros-row" style="display:none">
+                                    <span class="info-label">Otros nombres</span>
+                                    <span class="info-value" id="pr-otros"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Categoría</span>
+                                    <span class="info-value" id="pr-categoria"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Descripción</span>
+                                    <span class="info-value" id="pr-descripcion"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Uso(s)</span>
+                                    <span class="info-value" id="pr-usos"></span>
+                                </div>
+                                <div class="info-row" id="pr-mas-row" style="display:none">
+                                    <span class="info-label">Más información</span>
+                                    <span class="info-value" id="pr-mas"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============================
+         RESULT SCREEN
+    ============================= -->
+        <div class="result-overlay hidden" id="result-overlay">
+            <div class="result-card">
+                <div class="result-emoji" id="result-emoji">🎉</div>
+                <h2 class="result-title" id="result-title">¡Circuito completado!</h2>
+                <p class="result-message" id="result-message"></p>
+                <div class="result-stats">
+                    <div class="result-stat correct">
+                        <span class="rs-num" id="rs-correct">0</span>
+                        <span class="rs-label">Aciertos</span>
+                    </div>
+                    <div class="result-stat wrong">
+                        <span class="rs-num" id="rs-wrong">0</span>
+                        <span class="rs-label">Fallos</span>
+                    </div>
+                    <div class="result-stat percent">
+                        <span class="rs-num" id="rs-percent">0%</span>
+                        <span class="rs-label">Precisión</span>
+                    </div>
+                </div>
+                <button class="btn-next result-btn" onclick="restartQuiz()">🔄 Nuevo circuito</button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
